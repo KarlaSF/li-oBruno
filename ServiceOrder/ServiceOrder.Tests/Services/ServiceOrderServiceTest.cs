@@ -33,7 +33,7 @@ namespace Has_Service_Order.Tests.Services
         [Fact]
         public async Task GetAllAsync_ShouldReturnServiceOrders()
         {
-            // Arrange
+            
             var serviceOrders = new List<ServiceOrder>
             {
                 new ServiceOrder { Id = 1, Description = "Service 1", Price = 100, Status = StatusServiceOrder.OPEN },
@@ -49,44 +49,44 @@ namespace Has_Service_Order.Tests.Services
             _serviceOrderRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(serviceOrders);
             _mapperMock.Setup(mapper => mapper.Map<List<ServiceOrderDto>>(serviceOrders)).Returns(serviceOrderDtos);
 
-            // Act
+            
             var result = await _service.GetAllAsync();
 
-            // Assert
+            
             Assert.Equal(serviceOrderDtos, result);
         }
 
         [Fact]
         public async Task GetServiceOrderAsync_ShouldReturnServiceOrderDto_WhenServiceOrderExists()
         {
-            // Arrange
+            
             var serviceOrder = new ServiceOrder { Id = 1, Description = "Service 1", Price = 100, Status = StatusServiceOrder.OPEN };
             var serviceOrderDto = new ServiceOrderDto(1, "Service 1", 100, StatusServiceOrder.OPEN, DateTimeOffset.Now, DateTimeOffset.Now.AddHours(1), new List<CommentDto>());
 
             _serviceOrderRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(serviceOrder);
             _mapperMock.Setup(mapper => mapper.Map<ServiceOrderDto>(serviceOrder)).Returns(serviceOrderDto);
 
-            // Act
+            
             var result = await _service.GetServiceOrderAsync(1);
 
-            // Assert
+            
             Assert.Equal(serviceOrderDto, result);
         }
 
         [Fact]
         public async Task GetServiceOrderAsync_ShouldThrowNotFoundException_WhenServiceOrderDoesNotExist()
         {
-            // Arrange
+            
             _serviceOrderRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((ServiceOrder)null);
 
-            // Act & Assert
+            
             await Assert.ThrowsAsync<NotFoundException>(() => _service.GetServiceOrderAsync(1));
         }
 
         [Fact]
         public async Task CreateServiceOrderAsync_ShouldCreateAndReturnNewServiceOrderDto()
         {
-            // Arrange
+            
             var createServiceOrderDto = new CreateServiceOrderDto("New Service", 300, 1);
             var customer = new Customer { Id = 1 };
             var serviceOrder = new ServiceOrder { Id = 1, Description = "New Service", Price = 300, Status = StatusServiceOrder.OPEN, OpeningDate = DateTimeOffset.Now };
@@ -97,74 +97,62 @@ namespace Has_Service_Order.Tests.Services
             _serviceOrderRepositoryMock.Setup(repo => repo.AddAsync(serviceOrder)).Returns(Task.CompletedTask);
             _mapperMock.Setup(mapper => mapper.Map<NewServiceOrderDto>(serviceOrder)).Returns(newServiceOrderDto);
 
-            // Act
+            
             var result = await _service.CreateServiceOrderAsync(createServiceOrderDto);
 
-            // Assert
             Assert.Equal(newServiceOrderDto, result);
         }
 
         [Fact]
         public async Task CreateServiceOrderAsync_ShouldThrowBadRequest_WhenCustomerDoesNotExist()
         {
-            // Arrange
             var createServiceOrderDto = new CreateServiceOrderDto("New Service", 300, 1);
 
             _serviceCustomerMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((Customer)null);
 
-            // Act & Assert
             await Assert.ThrowsAsync<BadRequest>(() => _service.CreateServiceOrderAsync(createServiceOrderDto));
         }
 
         [Fact]
         public async Task FinishServiceOrderAsync_ShouldFinishServiceOrder_WhenServiceOrderExists()
         {
-            // Arrange
             var serviceOrder = new ServiceOrder { Id = 1, Description = "Service 1", Price = 100, Status = StatusServiceOrder.OPEN };
 
             _serviceOrderRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(serviceOrder);
             _serviceOrderRepositoryMock.Setup(repo => repo.FinishAsync(serviceOrder)).Returns(Task.CompletedTask);
 
-            // Act
             await _service.FinishServiceOrderAsync(1);
 
-            // Assert
             _serviceOrderRepositoryMock.Verify(repo => repo.FinishAsync(serviceOrder), Times.Once);
         }
 
         [Fact]
         public async Task FinishServiceOrderAsync_ShouldThrowNotFoundException_WhenServiceOrderDoesNotExist()
         {
-            // Arrange
+            
             _serviceOrderRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((ServiceOrder)null);
 
-            // Act & Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _service.FinishServiceOrderAsync(1));
         }
 
         [Fact]
         public async Task CancelServiceOrderAsync_ShouldCancelServiceOrder_WhenServiceOrderExists()
         {
-            // Arrange
             var serviceOrder = new ServiceOrder { Id = 1, Description = "Service 1", Price = 100, Status = StatusServiceOrder.OPEN };
 
             _serviceOrderRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(serviceOrder);
             _serviceOrderRepositoryMock.Setup(repo => repo.CancelAsync(serviceOrder)).Returns(Task.CompletedTask);
 
-            // Act
             await _service.CancelServiceOrderAsync(1);
 
-            // Assert
             _serviceOrderRepositoryMock.Verify(repo => repo.CancelAsync(serviceOrder), Times.Once);
         }
 
         [Fact]
         public async Task CancelServiceOrderAsync_ShouldThrowNotFoundException_WhenServiceOrderDoesNotExist()
         {
-            // Arrange
             _serviceOrderRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((ServiceOrder)null);
 
-            // Act & Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _service.CancelServiceOrderAsync(1));
         }
 

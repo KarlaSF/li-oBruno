@@ -35,7 +35,7 @@ namespace Has_Service_Order.Tests.Services
         [Fact]
         public async Task GetServiceOrderWithComments_ShouldReturnServiceOrderDto()
         {
-            // Arrange
+            
             int serviceOrderId = 1;
 
             var comments = new List<Comment>
@@ -77,10 +77,8 @@ namespace Has_Service_Order.Tests.Services
                 .Setup(mapper => mapper.Map<ServiceOrderDto>(serviceOrder))
                 .Returns(serviceOrderDto);
 
-            // Act
             var result = await _service.GetServiceOrderWithComments(serviceOrderId);
 
-            // Assert
             Assert.NotNull(result);
             Assert.Equal(serviceOrderDto.Id, result.Id);
             Assert.Equal(serviceOrderDto.Description, result.Description);
